@@ -1,55 +1,11 @@
 version: '3'
 
-#networks:
-#  net:
-#    driver: bridge
-
 services:
-#  chromadb:
-#    image: chromadb/chroma:0.5.20
-#    volumes:
-#      - ./chroma_db:/chroma/chroma
-#    environment:
-#      - IS_PERSISTENT=TRUE
-#      - PERSIST_DIRECTORY=/chroma/chroma # this is the default path, change it as needed
-#      - ANONYMIZED_TELEMETRY=${ANONYMIZED_TELEMETRY:-TRUE}
-#      - ALLOW_RESET=TRUE
-#    ports:
-#      - "8005:8000"
-#    networks:
-#      - net
-
-#  salt_cfp_docs_etl:
-#    build:
-#      context: ./salt_cfp_docs_etl
-#    env_file:
-#      - .env
-#    volumes:
-#      - ./chroma_db:/app/chroma_db/
-#      - ./data:/app/data
-#    healthcheck:
-#      test: [ "CMD", "cat", "/app/data/etl_complete" ]
-#      interval: 10s
-#      retries: 5
-#      timeout: 10s
-#    command: >
-#        sh -c "python etl_script.py && echo 'ETL complete' > /app/data/etl_complete"
-
-#  completion_waiter:
-#    image: busybox
-#    depends_on:
-#      salt_cfp_docs_etl:
-#        condition: service_completed_successfully
-#    command: [ "sh", "-c", "sleep 1" ] # Ensure it exits cleanly
-
   chatbot_api:
     build:
       context: ./chatbot_api
     env_file:
       - .env
-#    depends_on:
-#      completion_waiter:
-#        condition: service_completed_successfully
     ports:
       - "8001:8001"
     volumes:
