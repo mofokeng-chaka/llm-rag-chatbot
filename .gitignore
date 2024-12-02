@@ -1,6 +1,6 @@
 # IntelliJ files
 /.idea
-/.*.iml
+/*.iml
 
 # Local files
 /chroma_db
