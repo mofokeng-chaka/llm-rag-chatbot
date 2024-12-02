@@ -1,7 +1,5 @@
 # IntelliJ files
 /.idea
-/*/**.iml
-/*/venv
 /*.iml
 
 # Local data files
