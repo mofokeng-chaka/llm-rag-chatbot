@@ -3,8 +3,11 @@ import logging
 import os
 
 from embeddings.custom_embeddings import MyEmbeddingFunction
+from splitters.html_document_splitter import custom_html_splitter
+from tools.text_summaries import generate_text_summaries
 
-from langchain_community.vectorstores.chroma import Chroma
+from langchain_chroma.vectorstores import Chroma
+from langchain_core.documents import Document
 
 dotenv.load_dotenv()
 
@@ -31,4 +34,34 @@ db = Chroma(
     embedding_function=embeddings
 )
 
-retriever = db.as_retriever()
+if len(db.get()["documents"]) > 0:
+    retriever = db.as_retriever()
+else:
+    chunked_documents = custom_html_splitter(DOCUMENT_PATH)
+    texts = [doc.page_content for doc in chunked_documents]
+    doc_ids = [doc.metadata["doc_id"] for doc in chunked_documents]
+    headers = [doc.metadata["header"] for doc in chunked_documents]
+    links = [doc.metadata["link"] for doc in chunked_documents]
+
+    LOGGER.info(msg="Generating summaries of the page content...")
+    text_summaries, _ = generate_text_summaries(
+        texts, [], summarize_texts=True
+    )
+
+    LOGGER.info(msg="Adding summarized documents to the vectorstore...")
+    summary_docs = [
+        Document(page_content=s, metadata={
+            "doc_id": doc_ids[i],
+            "header": headers[i],
+            "link": links[i],
+        })
+        for i, s in enumerate(text_summaries)
+    ]
+
+    db = Chroma.from_documents(
+        documents=summary_docs,
+        collection_name=CHROMA_COLLECTION_NAME,
+        persist_directory=CHROMA_DATA_DIR,
+        embedding=embeddings
+    )
+    retriever = db.as_retriever()
