@@ -1,8 +1,10 @@
 # IntelliJ files
 /.idea
-/.*.iml
+/*/**.iml
+/*/venv
 
-# Local files
+# Local data files
 /chroma_db
 /data
+/*/chroma.log
 /.env
